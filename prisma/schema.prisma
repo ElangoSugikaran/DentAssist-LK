@@ -1,0 +1,83 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// create 3 model User, Doctor, Appointment
+
+model User {
+  id        String @id @default (cuid())
+  clerkId   String @unique
+  email     String @unique
+  firstName String?  // "?" means optional field
+  lastName  String?
+  phone     String?
+  createdAt DateTime @default(now()) // number since nov 2025
+  updatedAt DateTime @updatedAt
+
+  //relationships
+  appointments Appointment[]
+
+  @@map("users") // map to "users" table in db
+}
+
+model Doctor {
+  id        String @id @default (cuid())
+  name      String
+  email     String @unique
+  phone     String
+  specialty String
+  bio       String?
+  imageUrl  String
+  gender    Gender
+  isActive  Boolean @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  //relationships
+  appointments Appointment[]
+
+  @@map("doctors") // map to "doctors" table in db
+}
+
+ model Appointment {
+  id        String @id @default (cuid())
+  date      DateTime
+  time      String // store time as string i.e. "14:30"
+  duration  Int @default(30)// duration in minutes
+  status    AppointmentStatus @default(COMFIRMED)
+  notes     String?
+  reason    String? // reason for appointment - teeth cleaning? emergency visit? etc.
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  //foreign keys
+  userId String
+  doctorId String
+
+  //relationships
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  doctor Doctor @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+
+  @@map("appointments") // map to "appointments" table in db
+ }
+
+enum Gender {
+  MALE
+  FEMALE
+}
+
+enum AppointmentStatus {
+  COMFIRMED
+  COMPLETED
+}
