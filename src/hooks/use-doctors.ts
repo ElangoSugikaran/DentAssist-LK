@@ -1,6 +1,6 @@
 "use client";
 
-import { createDoctor, getDoctors, updateDoctor } from "@/lib/actions/doctors";
+import { createDoctor, getDoctors, updateDoctor, regenerateDoctorAvatars } from "@/lib/actions/doctors";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 
@@ -28,7 +28,20 @@ export function useCreateDoctor() {
     return result;
 }
 
-
+export function useRegenerateDoctorAvatars() {
+    const queryClient = useQueryClient();
+    
+    const result = useMutation({
+        mutationFn: regenerateDoctorAvatars,
+        onSuccess: () => {
+            console.log("Doctor avatars regenerated successfully");
+            queryClient.invalidateQueries({ queryKey: ["getDoctors"] });
+        },
+        onError: (error: any) => console.log("Error regenerating avatars:", error.message),
+    });
+    
+    return result;
+}
 export function useUpdateDoctor() {
     const queryClient = useQueryClient();
     

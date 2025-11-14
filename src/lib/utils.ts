@@ -6,11 +6,16 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function generateAvatar(name: string, gender: "MALE" | "FEMALE") {
-  const username = name.replace(/\s+/g, "").toLowerCase();
-  const base = "https://avatar.iran.liara.run/public";
-  if (gender === "FEMALE") return `${base}/girl?username=${username}`;
-  // default to boy
-  return `${base}/boy?username=${username}`;
+  // Using ui-avatars.com - more reliable and faster
+  // URL encodes the name and uses initials
+  const initials = name
+    .split(" ")
+    .map((n) => n.charAt(0))
+    .join("")
+    .toUpperCase()
+    .slice(0, 2);
+  
+  return `https://ui-avatars.com/api/?name=${encodeURIComponent(initials)}&background=random&color=fff&size=128`;
 }
 
 // Sri Lanka phone formatting: 0XX XXX XXXX

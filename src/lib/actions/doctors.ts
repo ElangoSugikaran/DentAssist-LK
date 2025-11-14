@@ -107,3 +107,22 @@ export async function updateDoctor(input: UpdateDoctorInput) {
     }
 }
 
+export async function regenerateDoctorAvatars() {
+    try {
+        const doctors = await prisma.doctor.findMany();
+        
+        for (const doctor of doctors) {
+            const newImageUrl = generateAvatar(doctor.name, doctor.gender);
+            await prisma.doctor.update({
+                where: { id: doctor.id },
+                data: { imageUrl: newImageUrl }
+            });
+        }
+
+        revalidatePath("/admin");
+        return { success: true, count: doctors.length };
+    } catch (error) {
+        console.log("Error regenerating avatars:", error);
+        throw new Error("Failed to regenerate avatars");
+    }
+}
