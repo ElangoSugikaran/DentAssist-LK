@@ -9,10 +9,10 @@ import { currentUser } from '@clerk/nextjs/server';
 import { redirect } from 'next/navigation';
 
 export default async function Home() {
-
+  // Check if user is already logged in
   const user = await currentUser();
 
-  // Redirect to dashboard if user is logged in
+  // Redirect to dashboard if user is logged in (webhook handles sync)
   if (user) redirect('/dashboard');
 
   return (

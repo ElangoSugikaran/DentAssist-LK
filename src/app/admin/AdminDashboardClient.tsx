@@ -7,6 +7,7 @@ import { useUser } from "@clerk/nextjs";
 import { SettingsIcon } from "lucide-react";
 import AdminStats from "@/components/admin/AdminStats";
 import DoctorsManagement from "@/components/admin/DoctorsManagement";
+import RecentAppointments from "@/components/admin/RecentAppointments";
 
 function AdminDashboardClient() {
       const { user } = useUser();
@@ -60,6 +61,8 @@ function AdminDashboardClient() {
             />
 
             <DoctorsManagement />
+
+            <RecentAppointments />
             
         </div>
     </div>

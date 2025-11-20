@@ -3,7 +3,6 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
 import { ClerkProvider } from '@clerk/nextjs';
-import UserSync from "@/components/UserSync";
 import TanStackProvider from "@/components/providers/TanStackProvider";
 import { Toaster } from "sonner";
 
@@ -45,7 +44,7 @@ export default function RootLayout({
             className={`${geistSans.variable} ${geistMono.variable} antialiased dark`}
             suppressHydrationWarning
           >
-            <UserSync />
+            {/* User sync is now handled by Clerk webhooks */}
             <Toaster />
             {children}
           </body>
@@ -54,3 +53,4 @@ export default function RootLayout({
     </TanStackProvider>
   );
 }
+
