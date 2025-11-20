@@ -36,3 +36,44 @@ export const formatPhoneNumber = (value: string) => {
   return `${phone.slice(0, 3)} ${phone.slice(3, 6)} ${phone.slice(6, 10)}`;
 };
 
+// Get next 5 days from today
+export const getNext5Days = () => {
+  const dates = [];
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+
+  for (let i = 0; i < 5; i++) {
+    const date = new Date(tomorrow);
+    date.setDate(date.getDate() + i);
+    dates.push(date.toISOString().split("T")[0]);
+  }
+
+  return dates;
+};
+
+// Available time slots for appointments
+export const getAvailableTimeSlots = () => {
+  return [
+    "09:00",
+    "09:30",
+    "10:00",
+    "10:30",
+    "11:00",
+    "11:30",
+    "14:00",
+    "14:30",
+    "15:00",
+    "15:30",
+    "16:00",
+    "16:30",
+  ];
+};
+
+// Appointment types with durations and prices
+export const APPOINTMENT_TYPES = [
+  { id: "checkup", name: "Regular Checkup", duration: "60 min", price: "$120" },
+  { id: "cleaning", name: "Teeth Cleaning", duration: "45 min", price: "$90" },
+  { id: "consultation", name: "Consultation", duration: "30 min", price: "$75" },
+  { id: "emergency", name: "Emergency Visit", duration: "30 min", price: "$150" },
+];
+

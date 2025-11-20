@@ -1,6 +1,6 @@
 "use client";
 
-import { createDoctor, getDoctors, updateDoctor, regenerateDoctorAvatars } from "@/lib/actions/doctors";
+import { createDoctor, getDoctors, updateDoctor, regenerateDoctorAvatars, getAvailableDoctors } from "@/lib/actions/doctors";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 
@@ -42,6 +42,7 @@ export function useRegenerateDoctorAvatars() {
     
     return result;
 }
+
 export function useUpdateDoctor() {
     const queryClient = useQueryClient();
     
@@ -55,6 +56,16 @@ export function useUpdateDoctor() {
     });
     
     return result;
+}
+
+// get available doctors for appointments
+export function useAvailableDoctors() {
+  const result = useQuery({
+    queryKey: ["getAvailableDoctors"],
+    queryFn: getAvailableDoctors,
+  });
+
+  return result;
 }
 
 
