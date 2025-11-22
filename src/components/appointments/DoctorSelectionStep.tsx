@@ -1,3 +1,31 @@
+/**
+ * DOCTOR SELECTION STEP - REFACTORED TO USE ZUSTAND
+ * ==================================================
+ * 
+ * WHAT CHANGED?
+ * -------------
+ * Before: We received selectedDentistId and onSelectDentist as props.
+ * After: We read selectedDentistId from Zustand store directly.
+ * 
+ * WHY?
+ * - No prop drilling (state is global)
+ * - Component is more independent
+ * - Easier to access state from anywhere
+ * 
+ * ZUSTAND USAGE:
+ * -------------
+ * We use useAppointmentStore to:
+ * 1. Read selectedDentistId (from global state)
+ * 2. Get handleSelectDentist action (to update state)
+ * 
+ * TANSTACK QUERY:
+ * --------------
+ * We still use TanStack Query for server data:
+ * - useAvailableDoctors() - fetches doctors from database
+ */
+
+"use client";
+
 import Image from "next/image";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
 import { MapPinIcon, PhoneIcon, StarIcon } from "lucide-react";
@@ -5,16 +33,31 @@ import { Button } from "../ui/button";
 import { Badge } from "../ui/badge";
 import { useAvailableDoctors } from "@/hooks/use-doctors";
 import { DoctorCardsLoading } from "./DoctorCardsLoading";
+import { useAppointmentStore } from "@/store/appointment-store"; // ✅ Import Zustand store
 
 
 interface DoctorSelectionStepProps {
-  selectedDentistId: string | null;
-  onSelectDentist: (dentistId: string) => void;
+  // We no longer need selectedDentistId as prop - it comes from Zustand
+  onSelectDentist: (dentistId: string) => void; // Still needed for callback
   onContinue: () => void;
 }
 
-function DoctorSelectionStep({ onContinue, onSelectDentist, selectedDentistId,}: DoctorSelectionStepProps) {
-  const {data: dentists = [] , isLoading}  = useAvailableDoctors();
+function DoctorSelectionStep({ onContinue, onSelectDentist }: DoctorSelectionStepProps) {
+  /**
+   * ZUSTAND STORE - CLIENT STATE
+   * ----------------------------
+   * Read selectedDentistId from Zustand store instead of props.
+   * This is global state, so any component can access it.
+   */
+  const selectedDentistId = useAppointmentStore((state) => state.selectedDentistId);
+  
+  /**
+   * TANSTACK QUERY - SERVER STATE
+   * ------------------------------
+   * Fetch doctors from database using TanStack Query.
+   * This is server data, so we use TanStack Query (not Zustand).
+   */
+  const { data: dentists = [], isLoading } = useAvailableDoctors();
 
   if (isLoading)
     return (
@@ -52,15 +95,10 @@ function DoctorSelectionStep({ onContinue, onSelectDentist, selectedDentistId,}:
                     {dentist.specialty || "General Dentistry"}
                   </CardDescription>
                   <div className="flex items-center gap-2 mt-2">
-                    <div className="flex items-center gap-1">
-                      <StarIcon className="w-4 h-4 fill-amber-400 text-amber-400" />
-                      <span className="text-sm font-medium">5</span>
-                    </div>
                     <span className="text-sm text-muted-foreground">
                       ({dentist.appointmentCount} appointments)
                     </span>
-                  </div>
-                </div>
+                  </div>                </div>
               </div>
             </CardHeader>
 

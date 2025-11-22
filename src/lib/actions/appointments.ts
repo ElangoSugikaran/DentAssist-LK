@@ -46,11 +46,17 @@ export async function getAppointments() {
 export async function getUserAppointmentStats() {
     try {
         const {userId} = await auth();
+        console.log("📊 getUserAppointmentStats: Fetching stats for clerkId:", userId);
+        
         if (!userId) throw new Error("User not authenticated");
         
         const user = await prisma.user.findUnique({ where: { clerkId: userId } });
+        console.log("🔍 getUserAppointmentStats: Found user in DB:", user?.id);
 
-        if (!user) throw new Error("User not found");
+        if (!user) {
+            console.error("❌ getUserAppointmentStats: User not found in database for clerkId:", userId);
+            throw new Error("User not found in database. Please try refreshing the page.");
+        }
 
         // these calls will run in parallel, instead of waiting each other
         const [totalCount, completedCount] = await Promise.all([
@@ -80,11 +86,18 @@ export async function getUserAppointments() {
     try {
          // get authenticated user from Clerk
         const { userId } = await auth();
+        console.log("📋 getUserAppointments: Fetching appointments for clerkId:", userId);
+        
         if (!userId) throw new Error("You must be logged in to view appointments");
 
         // find user by clerkId from authenticated session
         const user = await prisma.user.findUnique({ where: { clerkId: userId } });
-        if (!user) throw new Error("User not found. Please ensure your account is properly set up.");
+        console.log("🔍 getUserAppointments: Found user in DB:", user?.id);
+        
+        if (!user) {
+            console.error("❌ getUserAppointments: User not found in database for clerkId:", userId);
+            throw new Error("User not found in database. Your account may not be fully set up. Please refresh the page and try again.");
+        }
 
         const appointments = await prisma.appointment.findMany({
             where: { userId: user.id },
@@ -110,7 +123,7 @@ export async function getBookedTimeSlots(doctorId: string, date: string) {
         doctorId,
         date: new Date(date),
         status: {
-          in: ["COMFIRMED", "COMPLETED"], // consider both confirmed and completed appointments as blocking
+          in: ["CONFIRMED", "COMPLETED"], // consider both confirmed and completed appointments as blocking
         },
       },
       select: { time: true },
@@ -149,7 +162,7 @@ export async function bookAppointment(input: BookAppointmentInput) {
         date: new Date(input.date),
         time: input.time,
         reason: input.reason || "General consultation",
-        status: "COMFIRMED",
+        status: "CONFIRMED",
       },
       include: {
         user: {
@@ -169,7 +182,6 @@ export async function bookAppointment(input: BookAppointmentInput) {
     throw new Error("Failed to book appointment. Please try again later.");
   }
 }
-
 export async function updateAppointmentStatus(input: { id: string; status: AppointmentStatus }) {
   try {
     const appointment = await prisma.appointment.update({

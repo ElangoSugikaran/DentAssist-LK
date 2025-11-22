@@ -1,7 +1,7 @@
 "use client";
 
 import { UserButton, useUser } from "@clerk/nextjs";
-import { CalendarIcon, CrownIcon, HomeIcon, MicIcon } from "lucide-react";
+import { CalendarIcon, CrownIcon, HomeIcon, MicIcon, ShieldIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -9,6 +9,11 @@ import { usePathname } from "next/navigation";
 function Navbar() {
   const { user } = useUser();
   const pathname = usePathname();
+
+  // Check if user is admin from Clerk metadata
+  const isAdmin = 
+    (user?.publicMetadata as any)?.role === "admin" || 
+    user?.unsafeMetadata?.role === "admin";
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 px-6 py-2 border-b border-border/50 bg-background/80 backdrop-blur-md h-16">
@@ -51,6 +56,7 @@ function Navbar() {
               <MicIcon className="w-4 h-4" />
               <span className="hidden md:inline">Voice</span>
             </Link>
+
             <Link
               href="/pro"
               className={`flex items-center gap-2 transition-colors hover:text-foreground ${
@@ -60,6 +66,23 @@ function Navbar() {
               <CrownIcon className="w-4 h-4" />
               <span className="hidden md:inline">Pro</span>
             </Link>
+
+            {/* ADMIN LINK - Only visible to admins */}
+            {isAdmin && (
+              <Link
+                href="/admin"
+                className={`flex items-center gap-2 transition-colors relative ${
+                  pathname === "/admin"
+                    ? "text-primary font-medium"
+                    : "text-muted-foreground hover:text-primary"
+                }`}
+              >
+                <ShieldIcon className="w-4 h-4" />
+                <span className="hidden md:inline">Admin</span>
+                {/* Optional badge to make it stand out */}
+                <span className="absolute -top-1 -right-1 w-2 h-2 bg-primary rounded-full animate-pulse" />
+              </Link>
+            )}
           </div>
         </div>
 
@@ -82,4 +105,5 @@ function Navbar() {
     </nav>
   );
 }
+
 export default Navbar;

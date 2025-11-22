@@ -8,8 +8,37 @@ import { Button } from "../ui/button";
 
 
 async function DentalHealthOverview() {
-    const appointmentStats = await getUserAppointmentStats();
-    const user = await currentUser();
+  let appointmentStats = null;
+  let user = null;
+  let error = null;
+
+  try {
+    appointmentStats = await getUserAppointmentStats();
+    user = await currentUser();
+  } catch (err) {
+    console.error("Error in DentalHealthOverview:", err);
+    error = (err as Error).message || "Failed to load dental health data";
+  }
+
+  // If error occurred, show fallback UI
+  if (error || !appointmentStats || !user) {
+    return (
+      <Card className="lg:col-span-2 border-amber-200/50 bg-amber-50/50">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <BrainIcon className="size-5 text-amber-600" />
+            Your Dental Health
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="text-amber-700 text-sm">
+            <p>Loading your dental health information...</p>
+            <p className="text-xs text-amber-600/70 mt-2">If this persists, please refresh the page.</p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
      <Card className="lg:col-span-2">
@@ -42,7 +71,7 @@ async function DentalHealthOverview() {
           </div>
         </div>
 
-        <div className="mt-6 p-4 bg-gradient-to-r from-primary/10 to-primary/5 rounded-xl border border-primary/20">
+        <div className="mt-6 p-4 bg-linear-to-r from-primary/10 to-primary/5 rounded-xl border border-primary/20">
           <div className="flex items-start gap-3">
             <div className="size-10 bg-primary/20 rounded-lg flex items-center justify-center shrink-0">
               <MessageSquareIcon className="size-5 text-primary" />

@@ -10,67 +10,68 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+  // Note: In Prisma 7+, remove this url line and pass connection to PrismaClient constructor
+  // For Prisma 6.x, this format is still required
   url      = env("DATABASE_URL")
 }
 
-// create 3 model User, Doctor, Appointment
-
 model User {
-  id        String @id @default (cuid())
+  id        String @id @default(cuid())
   clerkId   String @unique
   email     String @unique
-  firstName String?  // "?" means optional field
+  firstName String?
   lastName  String?
   phone     String?
-  createdAt DateTime @default(now()) // number since nov 2025
+  role      String @default("user") // "admin" or "user" - managed via Clerk metadata
+  createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  //relationships
+  // relationships
   appointments Appointment[]
 
-  @@map("users") // map to "users" table in db
+  @@map("users")
 }
 
 model Doctor {
-  id        String @id @default (cuid())
-  name      String
-  email     String @unique
-  phone     String
-  specialty String
-  bio       String?
-  imageUrl  String
-  gender    Gender
-  isActive  Boolean @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String   @id @default(cuid())
+  name        String
+  email       String   @unique
+  phone       String
+  specialty   String   // Doctor's specialty (e.g., "Pediatrics", "Orthodontics")
+  bio         String?
+  imageUrl    String
+  gender      Gender
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
-  //relationships
+  // relationships
   appointments Appointment[]
 
-  @@map("doctors") // map to "doctors" table in db
+  @@map("doctors")
 }
 
- model Appointment {
-  id        String @id @default (cuid())
+model Appointment {
+  id        String            @id @default(cuid())
   date      DateTime
   time      String // store time as string i.e. "14:30"
-  duration  Int @default(30)// duration in minutes
-  status    AppointmentStatus @default(COMFIRMED)
+  duration  Int               @default(30) // duration in minutes
+  status    AppointmentStatus @default(CONFIRMED)
   notes     String?
   reason    String? // reason for appointment - teeth cleaning? emergency visit? etc.
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
 
-  //foreign keys
-  userId String
+  // foreign keys
+  userId   String
   doctorId String
 
-  //relationships
-  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  // relationships
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   doctor Doctor @relation(fields: [doctorId], references: [id], onDelete: Cascade)
 
-  @@map("appointments") // map to "appointments" table in db
- }
+  @@map("appointments")
+}
 
 enum Gender {
   MALE
@@ -78,6 +79,6 @@ enum Gender {
 }
 
 enum AppointmentStatus {
-  COMFIRMED
+  CONFIRMED
   COMPLETED
 }

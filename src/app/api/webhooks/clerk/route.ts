@@ -51,8 +51,11 @@ export async function POST(req: Request) {
   try {
     if (eventType === "user.created") {
       // User just signed up - create record in database
-      const { id, email_addresses, first_name, last_name, phone_numbers } =
+      const { id, email_addresses, first_name, last_name, phone_numbers, unsafe_metadata } =
         evt.data;
+
+      // Check if this user should be admin based on Clerk metadata
+      const role = unsafe_metadata?.role === "admin" ? "admin" : "user";
 
       await prisma.user.create({
         data: {
@@ -61,16 +64,20 @@ export async function POST(req: Request) {
           firstName: first_name || null,
           lastName: last_name || null,
           phone: phone_numbers[0]?.phone_number || null,
+          role, // Store role from Clerk metadata
         },
       });
 
-      console.log(`✅ User created in database: ${id}`);
+      console.log(`✅ User created in database: ${id} (role: ${role})`);
     }
 
     if (eventType === "user.updated") {
       // User updated their profile - update database record
-      const { id, email_addresses, first_name, last_name, phone_numbers } =
+      const { id, email_addresses, first_name, last_name, phone_numbers, unsafe_metadata } =
         evt.data;
+
+      // Sync role from Clerk metadata
+      const role = unsafe_metadata?.role === "admin" ? "admin" : "user";
 
       await prisma.user.update({
         where: { clerkId: id },
@@ -79,10 +86,11 @@ export async function POST(req: Request) {
           firstName: first_name || null,
           lastName: last_name || null,
           phone: phone_numbers[0]?.phone_number || null,
+          role, // Update role from Clerk metadata
         },
       });
 
-      console.log(`✅ User updated in database: ${id}`);
+      console.log(`✅ User updated in database: ${id} (role: ${role})`);
     }
 
     if (eventType === "user.deleted") {
