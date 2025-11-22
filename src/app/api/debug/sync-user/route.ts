@@ -2,7 +2,8 @@ import { currentUser } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 
 // Debug endpoint to manually sync user - only for development
-export async function GET(req: Request) {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export async function GET(_req: Request) {
   try {
     const user = await currentUser();
     console.log("📌 [DEBUG] Current user from Clerk:", user?.id, user?.emailAddresses[0]?.emailAddress);

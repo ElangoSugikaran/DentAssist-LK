@@ -11,8 +11,11 @@ function Navbar() {
   const pathname = usePathname();
 
   // Check if user is admin from Clerk metadata
+  interface ClerkMetadata {
+    role?: string;
+  }
   const isAdmin = 
-    (user?.publicMetadata as any)?.role === "admin" || 
+    (user?.publicMetadata as ClerkMetadata | undefined)?.role === "admin" || 
     user?.unsafeMetadata?.role === "admin";
 
   return (

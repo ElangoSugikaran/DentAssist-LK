@@ -4,29 +4,28 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui
 import { Calendar } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
 import { Button } from "../ui/button";
+import { AppointmentStatus } from "@prisma/client";
 
 function RecentAppointments() {
   const { data: appointments = [] } = useGetAppointments();
   const updateAppointmentMutation = useUpdateAppointmentStatus();
 
- // keep DB spelling constants (use everywhere you read/write to DB)
+// Use Prisma enum values directly
 const DB_STATUS = {
-  COMFIRMED: "COMFIRMED", // DB has typo — keep it here to avoid DB changes
-  COMPLETED: "COMPLETED",
+  CONFIRMED: "CONFIRMED" as AppointmentStatus,
+  COMPLETED: "COMPLETED" as AppointmentStatus,
 } as const;
 
-type DBStatus = typeof DB_STATUS[keyof typeof DB_STATUS];
-
 // map DB values to pretty display strings
-const DISPLAY_STATUS: Record<DBStatus, string> = {
-  [DB_STATUS.COMFIRMED]: "Confirmed",
-  [DB_STATUS.COMPLETED]: "Completed",
+const DISPLAY_STATUS: Record<AppointmentStatus, string> = {
+  CONFIRMED: "Confirmed",
+  COMPLETED: "Completed",
 };
 
 // optional: helper that returns a safe display string
 const getDisplayStatus = (status?: string) => {
   if (!status) return "Unknown";
-  return DISPLAY_STATUS[status as DBStatus] ?? status;
+  return DISPLAY_STATUS[status as AppointmentStatus] ?? status;
 };
 
 // toggle: still send DB values to backend
@@ -34,10 +33,10 @@ const handleToggleAppointmentStatus = (appointmentId: string) => {
   const appointment = appointments.find((apt) => apt.id === appointmentId);
   if (!appointment) return;
 
-  const newStatus =
-    appointment.status === DB_STATUS.COMFIRMED
+  const newStatus: AppointmentStatus =
+    appointment.status === DB_STATUS.CONFIRMED
       ? DB_STATUS.COMPLETED
-      : DB_STATUS.COMFIRMED;
+      : DB_STATUS.CONFIRMED;
 
   updateAppointmentMutation.mutate({ id: appointmentId, status: newStatus });
 };
@@ -47,7 +46,7 @@ const getStatusBadge = (status: string) => {
   const label = getDisplayStatus(status);
 
   switch (status) {
-    case DB_STATUS.COMFIRMED:
+    case DB_STATUS.CONFIRMED:
       return (
         <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-100">
           {label}

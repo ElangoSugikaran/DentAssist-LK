@@ -24,7 +24,7 @@ interface AppointmentBookingState {
     time: string;
     patientEmail: string;
     doctorImageUrl: string;
-    reason: string;
+    reason: string | null;
   } | null;
 }
 

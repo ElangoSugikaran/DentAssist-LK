@@ -11,7 +11,11 @@ function VapiWidget() {
     const [callActive, setCallActive] = useState(false);
     const [connecting, setConnecting] = useState(false);
     const [isSpeaking, setIsSpeaking] = useState(false);
-    const [messages, setMessages] = useState<any[]>([]);
+    interface VapiMessage {
+        content: string;
+        role: string;
+    }
+    const [messages, setMessages] = useState<VapiMessage[]>([]);
     const [callEnded, setCallEnded] = useState(false);
 
     const { user, isLoaded} = useUser();
@@ -53,14 +57,20 @@ function VapiWidget() {
         setIsSpeaking(false);
       };
 
-      const handleMessage = (message: any) => {
-        if (message.type === "transcript" && message.transcriptType === "final") {
-          const newMessage = { content: message.transcript, role: message.role };
+      interface VapiMessageEvent {
+        type: string;
+        transcriptType?: string;
+        transcript?: string;
+        role?: string;
+      }
+      const handleMessage = (message: VapiMessageEvent) => {
+        if (message.type === "transcript" && message.transcriptType === "final" && message.transcript && message.role) {
+          const newMessage: VapiMessage = { content: message.transcript, role: message.role };
           setMessages((prev) => [...prev, newMessage]);
         }
       };
 
-      const handleError = (error: any) => {
+      const handleError = (error: Error | unknown) => {
         console.log("Vapi Error", error);
         setConnecting(false);
         setCallActive(false);
@@ -202,7 +212,7 @@ function VapiWidget() {
             {/* User Image */}
             <div className="relative size-32 mb-4">
               <Image
-                src={user?.imageUrl!}
+                src={user?.imageUrl || "/logo.png"}
                 alt="User"
                 width={128}
                 height={128}

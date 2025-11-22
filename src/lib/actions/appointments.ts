@@ -5,14 +5,35 @@ import { prisma } from "../prisma";
 import { AppointmentStatus } from "@prisma/client";
 
 
-function transformAppointment(appointment: any) {
+interface AppointmentWithRelations {
+  id: string;
+  status: AppointmentStatus;
+  user: {
+    firstName: string | null;
+    lastName: string | null;
+    email: string;
+  };
+  doctor: {
+    name: string;
+    imageUrl: string | null;
+  };
+  date: Date;
+  time: string;
+  reason: string | null;
+  [key: string]: unknown;
+}
+
+function transformAppointment(appointment: AppointmentWithRelations) {
   return {
-    ...appointment,
+    id: appointment.id,
+    status: appointment.status,
     patientName: `${appointment.user.firstName || ""} ${appointment.user.lastName || ""}`.trim(),
     patientEmail: appointment.user.email,
     doctorName: appointment.doctor.name,
     doctorImageUrl: appointment.doctor.imageUrl || "",
     date: appointment.date.toISOString().split("T")[0],
+    time: appointment.time,
+    reason: appointment.reason || null,
   };
 }
 

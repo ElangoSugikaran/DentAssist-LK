@@ -5,7 +5,8 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-export function generateAvatar(name: string, gender: "MALE" | "FEMALE") {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export function generateAvatar(name: string, _gender: "MALE" | "FEMALE") {
   // Using ui-avatars.com - more reliable and faster
   // URL encodes the name and uses initials
   const initials = name

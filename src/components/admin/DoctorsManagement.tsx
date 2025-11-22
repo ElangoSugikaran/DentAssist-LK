@@ -3,12 +3,11 @@ import { useState } from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { StethoscopeIcon, PlusIcon, MailIcon, PhoneIcon, EditIcon, Edit } from "lucide-react";
+import { StethoscopeIcon, PlusIcon, MailIcon, PhoneIcon, EditIcon } from "lucide-react";
 import Image from "next/image";
 import AddDoctorDialog from "./AddDoctorDialog";
 import EditDoctorDialog from "./EditDoctorDialog";
 import { Doctor } from "@prisma/client";
-import { id } from "date-fns/locale";
 
 
 function DoctorsManagement() {

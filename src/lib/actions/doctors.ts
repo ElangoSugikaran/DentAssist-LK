@@ -57,11 +57,11 @@ export  async function createDoctor(input:CreateDoctorInput) {
 
         return doctor;
 
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.log("Error creating doctor:", error);
 
         // Handle duplicate email error
-        if (error?.code === "P2002") {
+        if (error && typeof error === "object" && "code" in error && error.code === "P2002") {
             throw new Error("A doctor with this email already exists.");
         }
 

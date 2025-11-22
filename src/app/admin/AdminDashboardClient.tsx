@@ -16,9 +16,11 @@ function AdminDashboardClient() {
   const { data: appointments = [], isLoading: appointmentsLoading } = useGetAppointments();
 
   // Check if user has admin role from Clerk metadata (check both public and unsafe)
+  interface ClerkMetadata {
+    role?: string;
+  }
   const isAdminVerified = 
-    (user?.publicMetadata as any)?.role === "admin" || 
-    user?.unsafeMetadata?.role === "admin";
+    (user?.publicMetadata as ClerkMetadata | undefined)?.role === "admin";
 
   // calculate stats from real data
   const stats = {

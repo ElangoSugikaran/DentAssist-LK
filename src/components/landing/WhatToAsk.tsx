@@ -42,7 +42,7 @@ function WhatToAsk() {
                     <div className="space-y-3 flex-1">
                       <div className="bg-primary/5 rounded-2xl p-4 border border-primary/10">
                         <p className="font-semibold text-primary">
-                          "My tooth hurts when I bite down"
+                          &quot;My tooth hurts when I bite down&quot;
                         </p>
                       </div>
                       <div className="bg-muted/30 rounded-2xl p-4">
@@ -74,7 +74,7 @@ function WhatToAsk() {
                     <div className="space-y-3 flex-1">
                       <div className="bg-primary/5 rounded-2xl p-4 border border-primary/10">
                         <p className="font-semibold text-primary">
-                          "How much does teeth whitening cost?"
+                          &quot;How much does teeth whitening cost?&quot;
                         </p>
                       </div>
                       <div className="bg-muted/30 rounded-2xl p-4">
@@ -106,7 +106,7 @@ function WhatToAsk() {
                     <div className="space-y-3 flex-1">
                       <div className="bg-primary/5 rounded-2xl p-4 border border-primary/10">
                         <p className="font-semibold text-primary">
-                          "When should I replace my filling?"
+                          &quot;When should I replace my filling?&quot;
                         </p>
                       </div>
                       <div className="bg-muted/30 rounded-2xl p-4">

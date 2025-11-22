@@ -23,7 +23,10 @@ export function useCreateDoctor() {
             queryClient.invalidateQueries({ queryKey: ["getDoctors"] });
             queryClient.invalidateQueries({ queryKey: ["getAvailableDoctors"] });
         },
-        onError: (error: any) => console.log("Error creating doctor:", error.message),
+        onError: (error: Error | unknown) => {
+            const message = error instanceof Error ? error.message : "Unknown error";
+            console.log("Error creating doctor:", message);
+        },
     });
     
     return result;
@@ -38,7 +41,10 @@ export function useRegenerateDoctorAvatars() {
             console.log("Doctor avatars regenerated successfully");
             queryClient.invalidateQueries({ queryKey: ["getDoctors"] });
         },
-        onError: (error: any) => console.log("Error regenerating avatars:", error.message),
+        onError: (error: Error | unknown) => {
+            const message = error instanceof Error ? error.message : "Unknown error";
+            console.log("Error regenerating avatars:", message);
+        },
     });
     
     return result;
@@ -53,7 +59,10 @@ export function useUpdateDoctor() {
             console.log("Doctor updated successfully");
             queryClient.invalidateQueries({ queryKey: ["getDoctors"] });
         },
-        onError: (error: any) => console.log("Error updating doctor:", error.message),
+        onError: (error: Error | unknown) => {
+            const message = error instanceof Error ? error.message : "Unknown error";
+            console.log("Error updating doctor:", message);
+        },
     });
     
     return result;

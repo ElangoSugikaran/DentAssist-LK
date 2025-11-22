@@ -28,7 +28,7 @@
 
 import Image from "next/image";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
-import { MapPinIcon, PhoneIcon, StarIcon } from "lucide-react";
+import { MapPinIcon, PhoneIcon } from "lucide-react";
 import { Button } from "../ui/button";
 import { Badge } from "../ui/badge";
 import { useAvailableDoctors } from "@/hooks/use-doctors";

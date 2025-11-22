@@ -16,8 +16,11 @@ export async function checkAdminAccess() {
 
   // Method 1: Check Clerk metadata (primary method - most reliable)
   // Check both publicMetadata and unsafeMetadata for flexibility
+  interface ClerkMetadata {
+    role?: string;
+  }
   const isAdminInClerk = 
-    (user.publicMetadata as any)?.role === "admin" || 
+    (user.publicMetadata as ClerkMetadata | undefined)?.role === "admin" || 
     user.unsafeMetadata?.role === "admin";
   
   if (isAdminInClerk) {
@@ -85,8 +88,11 @@ async function syncAdminRoleToDatabase(clerkId: string) {
     if (!user) return;
 
     // Check both publicMetadata and unsafeMetadata
+    interface ClerkMetadata {
+      role?: string;
+    }
     const isAdmin = 
-      (user.publicMetadata as any)?.role === "admin" || 
+      (user.publicMetadata as ClerkMetadata | undefined)?.role === "admin" || 
       user.unsafeMetadata?.role === "admin";
     const role = isAdmin ? "admin" : "user";
 
@@ -137,8 +143,11 @@ export async function setUserAsAdmin(clerkId: string): Promise<boolean> {
       throw new Error("Not authenticated");
     }
 
+    interface ClerkMetadata {
+      role?: string;
+    }
     const callerIsAdmin = 
-      (caller.publicMetadata as any)?.role === "admin" || 
+      (caller.publicMetadata as ClerkMetadata | undefined)?.role === "admin" || 
       caller.unsafeMetadata?.role === "admin";
     if (!callerIsAdmin) {
       throw new Error("Only admins can grant admin access");
