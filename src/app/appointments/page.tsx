@@ -1,5 +1,38 @@
 "use client";
 
+/**
+ * APPOINTMENTS PAGE - REFACTORED TO USE ZUSTAND
+ * ==============================================
+ * 
+ * WHAT CHANGED?
+ * -------------
+ * Before: We used useState for all booking state and passed it through props (prop drilling).
+ * After: We use Zustand store for all booking state. Components read directly from the store.
+ * 
+ * WHY?
+ * - Cleaner code (no prop drilling)
+ * - State persists across page refreshes (with persist middleware)
+ * - Easier to access state from anywhere
+ * - Better separation of concerns
+ * 
+ * ZUSTAND STORE USAGE:
+ * -------------------
+ * We import useAppointmentStore and use it to:
+ * 1. Read state (selectedDentistId, selectedDate, etc.)
+ * 2. Get actions (handleSelectDentist, setCurrentStep, etc.)
+ * 3. Update state (through actions)
+ * 
+ * TANSTACK QUERY:
+ * --------------
+ * We still use TanStack Query for server data:
+ * - useBookAppointment() - mutation to save appointment to database
+ * - useUserAppointments() - query to fetch user's appointments
+ * 
+ * This is the correct pattern:
+ * - Zustand = Client state (UI state, user selections)
+ * - TanStack Query = Server state (database data, API calls)
+ */
+
 import { AppointmentConfirmationModal } from "@/components/appointments/AppointmentConfirmationModal";
 import BookingConfirmationStep from "@/components/appointments/BookingConfirmationStep";
 import DoctorSelectionStep from "@/components/appointments/DoctorSelectionStep";
@@ -8,33 +41,109 @@ import TimeSelectionStep from "@/components/appointments/TimeSelectionStep";
 import Navbar from "@/components/Navbar";
 import { useBookAppointment, useUserAppointments } from "@/hooks/use-appointments";
 import { APPOINTMENT_TYPES } from "@/lib/utils";
+import { useAppointmentStore } from "@/store/appointment-store"; // ✅ Import Zustand store
 import { format } from "date-fns";
-import { useState } from "react";
 import { toast } from "sonner";
 
 function AppointmentsPage() {
-    // state management for the booking process - this could be done with something like Zustand for larger apps
-    const [selectedDentistId, setSelectedDentistId] = useState<string | null>(null);
-    const [selectedDate, setSelectedDate] = useState("");
-    const [selectedTime, setSelectedTime] = useState("");
-    const [selectedType, setSelectedType] = useState("");
-    const [currentStep, setCurrentStep] = useState(1); // 1: select dentist, 2: select time, 3: confirm
-    const [showConfirmationModal, setShowConfirmationModal] = useState(false);
-    const [bookedAppointment, setBookedAppointment] = useState<any>(null);
-
+    /**
+     * ZUSTAND STORE - CLIENT STATE MANAGEMENT
+     * ----------------------------------------
+     * Instead of useState, we now use Zustand store for all booking state.
+     * 
+     * How it works:
+     * - useAppointmentStore is a hook that gives us access to the store
+     * - We pass a selector function to get specific parts of the state
+     * - When state changes, components using it automatically re-render
+     * 
+     * Benefits:
+     * - No prop drilling (state is global)
+     * - State persists in localStorage (with persist middleware)
+     * - Any component can access this state
+     */
+    
+    /**
+     * OPTIMIZED ZUSTAND STORE USAGE
+     * ------------------------------
+     * Instead of calling useAppointmentStore multiple times (which causes multiple
+     * subscriptions), we use a single selector to get all needed state at once.
+     * 
+     * This is more performant because:
+     * - Only one subscription to the store
+     * - Component re-renders only when selected values change
+     * - Zustand only re-renders when the selected values change (shallow comparison)
+     * 
+     * Note: Zustand is already optimized, but using a single selector is a best practice.
+     */
+    
+    // Read state from Zustand store (optimized - single selector)
+    const {
+      // State values
+      selectedDentistId,
+      selectedDate,
+      selectedTime,
+      selectedType,
+      currentStep,
+      showConfirmationModal,
+      bookedAppointment,
+      // Action functions
+      handleSelectDentist,
+      setCurrentStep,
+      setShowConfirmationModal,
+      setBookedAppointment,
+      setSelectedDate,
+      setSelectedTime,
+      setSelectedType,
+      resetBooking,
+    } = useAppointmentStore((state) => ({
+      // State
+      selectedDentistId: state.selectedDentistId,
+      selectedDate: state.selectedDate,
+      selectedTime: state.selectedTime,
+      selectedType: state.selectedType,
+      currentStep: state.currentStep,
+      showConfirmationModal: state.showConfirmationModal,
+      bookedAppointment: state.bookedAppointment,
+      // Actions
+      handleSelectDentist: state.handleSelectDentist,
+      setCurrentStep: state.setCurrentStep,
+      setShowConfirmationModal: state.setShowConfirmationModal,
+      setBookedAppointment: state.setBookedAppointment,
+      setSelectedDate: state.setSelectedDate,
+      setSelectedTime: state.setSelectedTime,
+      setSelectedType: state.setSelectedType,
+      resetBooking: state.resetBooking,
+    }));
+    
+    /**
+     * TANSTACK QUERY - SERVER STATE MANAGEMENT
+     * ----------------------------------------
+     * We still use TanStack Query for server data (data from database/API).
+     * This is the correct pattern:
+     * - Zustand = Client state (user selections, UI state)
+     * - TanStack Query = Server state (database queries, mutations)
+     */
     const bookAppointmentMutation = useBookAppointment();
     const { data: userAppointments = [] } = useUserAppointments();
 
-    const handleSelectDentist = (dentistId: string) => {
-        setSelectedDentistId(dentistId);
-
-        // reset the state when dentist changes
-        setSelectedDate("");
-        setSelectedTime("");
-        setSelectedType("");
-    };
-
+    /**
+     * HANDLE BOOK APPOINTMENT
+     * -----------------------
+     * This function handles the booking submission.
+     * 
+     * Flow:
+     * 1. Validate that all required fields are filled (using Zustand state)
+     * 2. Call TanStack Query mutation to save to database (server action)
+     * 3. On success:
+     *    - Store appointment data in Zustand (for confirmation modal)
+     *    - Send confirmation email
+     *    - Show confirmation modal
+     *    - Reset booking state (using Zustand action)
+     * 
+     * Note: We read from Zustand (client state) and save to database (server state).
+     */
     const handleBookAppointment = () => {
+        // Validate using Zustand state
         if (!selectedDentistId || !selectedDate || !selectedTime) {
             toast.error("Please fill in all required fields");
             return;
@@ -42,8 +151,11 @@ function AppointmentsPage() {
 
         const appointmentType = APPOINTMENT_TYPES.find((t) => t.id === selectedType);
 
+        // Use TanStack Query mutation to save to database
+        // This calls the server action which uses Prisma to save to database
         bookAppointmentMutation.mutate(
             {
+                // All these values come from Zustand store (client state)
                 doctorId: selectedDentistId,
                 date: selectedDate,
                 time: selectedTime,
@@ -51,11 +163,20 @@ function AppointmentsPage() {
             },
             {
                 onSuccess: async (appointment) => {
-                    // Store the appointment details to show in the modal
+                    /**
+                     * ON SUCCESS - After booking is saved to database
+                     * ------------------------------------------------
+                     * 1. Store appointment in Zustand (for confirmation modal)
+                     * 2. Send confirmation email
+                     * 3. Show modal
+                     * 4. Reset booking state
+                     */
+                    
+                    // Store appointment in Zustand (client state for UI)
                     setBookedAppointment(appointment);
 
-                    // send email using Resend API here with appointment details 
-                     try {
+                    // Send confirmation email using Resend API
+                    try {
                       const emailResponse = await fetch("/api/send-appointment-email", {
                         method: "POST",
                         headers: {
@@ -77,22 +198,16 @@ function AppointmentsPage() {
                       console.error("Error sending confirmation email:", error);
                     }
 
-
-
-                    // Show the success modal
+                    // Show the success modal (update Zustand state)
                     setShowConfirmationModal(true);
 
-                    // reset form
-                    setSelectedDentistId(null);
-                    setSelectedDate("");
-                    setSelectedTime("");
-                    setSelectedType("");
-                    setCurrentStep(1);
+                    // Reset booking state using Zustand action
+                    // This clears all selections and returns to step 1
+                    resetBooking();
                 },
-                 onError: (error) => toast.error(`Failed to book appointment: ${error.message}`),
+                onError: (error) => toast.error(`Failed to book appointment: ${error.message}`),
             }
         );
-
     };
 
   return (
@@ -108,9 +223,22 @@ function AppointmentsPage() {
 
         <ProgressSteps currentStep={currentStep} />
 
+        {/**
+         * STEP RENDERING - USING ZUSTAND STATE
+         * -------------------------------------
+         * Before: We passed state and callbacks as props (prop drilling).
+         * After: Components read directly from Zustand store.
+         * 
+         * Benefits:
+         * - No prop drilling
+         * - Cleaner component code
+         * - State is accessible from anywhere
+         * 
+         * Note: Components still receive callbacks for step navigation,
+         * but state is read from Zustand internally.
+         */}
         {currentStep === 1 && (
           <DoctorSelectionStep
-            selectedDentistId={selectedDentistId}
             onContinue={() => setCurrentStep(2)}
             onSelectDentist={handleSelectDentist}
           />
@@ -118,10 +246,6 @@ function AppointmentsPage() {
 
         {currentStep === 2 && selectedDentistId && (
           <TimeSelectionStep
-            selectedDentistId={selectedDentistId}
-            selectedDate={selectedDate}
-            selectedTime={selectedTime}
-            selectedType={selectedType}
             onBack={() => setCurrentStep(1)}
             onContinue={() => setCurrentStep(3)}
             onDateChange={setSelectedDate}
@@ -132,10 +256,6 @@ function AppointmentsPage() {
 
         {currentStep === 3 && selectedDentistId && (
           <BookingConfirmationStep
-            selectedDentistId={selectedDentistId}
-            selectedDate={selectedDate}
-            selectedTime={selectedTime}
-            selectedType={selectedType}
             isBooking={bookAppointmentMutation.isPending}
             onBack={() => setCurrentStep(2)}
             onModify={() => setCurrentStep(2)}
@@ -166,6 +286,7 @@ function AppointmentsPage() {
               <div key={appointment.id} className="bg-card border rounded-lg p-4 shadow-sm">
                 <div className="flex items-center gap-3 mb-3">
                   <div className="size-10 bg-primary/10 rounded-full flex items-center justify-center">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={appointment.doctorImageUrl}
                       alt={appointment.doctorName}

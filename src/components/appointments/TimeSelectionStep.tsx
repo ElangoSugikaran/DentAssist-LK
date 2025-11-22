@@ -1,19 +1,49 @@
+/**
+ * TIME SELECTION STEP - REFACTORED TO USE ZUSTAND
+ * ================================================
+ * 
+ * WHAT CHANGED?
+ * -------------
+ * Before: We received all state (selectedDentistId, selectedDate, etc.) as props.
+ * After: We read state from Zustand store directly.
+ * 
+ * WHY?
+ * - No prop drilling (state is global)
+ * - Component is more independent
+ * - Easier to maintain
+ * 
+ * ZUSTAND USAGE:
+ * -------------
+ * We use useAppointmentStore to:
+ * 1. Read state (selectedDentistId, selectedDate, selectedTime, selectedType)
+ * 2. Get actions (setSelectedDate, setSelectedTime, setSelectedType)
+ * 
+ * TANSTACK QUERY:
+ * --------------
+ * We still use TanStack Query for server data:
+ * - useBookedTimeSlots() - fetches booked times from database
+ * 
+ * NOTE:
+ * We still receive callbacks (onBack, onContinue) as props because
+ * they handle step navigation which is specific to the parent component.
+ */
+
+"use client";
+
 import { useBookedTimeSlots } from "@/hooks/use-appointments";
 import { APPOINTMENT_TYPES, getAvailableTimeSlots, getNext5Days } from "@/lib/utils";
 import { Button } from "../ui/button";
 import { ChevronLeftIcon, ClockIcon } from "lucide-react";
 import { Card, CardContent } from "../ui/card";
+import { useAppointmentStore } from "@/store/appointment-store"; // ✅ Import Zustand store
 
 interface TimeSelectionStepProps {
-  selectedDentistId: string;
-  selectedDate: string;
-  selectedTime: string;
-  selectedType: string;
-  onDateChange: (date: string) => void;
-  onTimeChange: (time: string) => void;
-  onTypeChange: (type: string) => void;
+  // We no longer need state as props - they come from Zustand
   onBack: () => void;
   onContinue: () => void;
+  onDateChange: (date: string) => void; // Still needed for parent callback
+  onTimeChange: (time: string) => void;
+  onTypeChange: (type: string) => void;
 }
 
 function TimeSelectionStep({
@@ -22,20 +52,59 @@ function TimeSelectionStep({
   onDateChange,
   onTimeChange,
   onTypeChange,
-  selectedDate,
-  selectedDentistId,
-  selectedTime,
-  selectedType,
 }: TimeSelectionStepProps) {
-  const { data: bookedTimeSlots = [] } = useBookedTimeSlots(selectedDentistId, selectedDate);
+  /**
+   * ZUSTAND STORE - CLIENT STATE
+   * ----------------------------
+   * Read all selection state from Zustand store instead of props.
+   * This is global state, accessible from anywhere.
+   */
+  const selectedDentistId = useAppointmentStore((state) => state.selectedDentistId);
+  const selectedDate = useAppointmentStore((state) => state.selectedDate);
+  const selectedTime = useAppointmentStore((state) => state.selectedTime);
+  const selectedType = useAppointmentStore((state) => state.selectedType);
+  
+  // Get Zustand actions to update state
+  const setSelectedDate = useAppointmentStore((state) => state.setSelectedDate);
+  const setSelectedTime = useAppointmentStore((state) => state.setSelectedTime);
+  const setSelectedType = useAppointmentStore((state) => state.setSelectedType);
+  
+  /**
+   * TANSTACK QUERY - SERVER STATE
+   * ------------------------------
+   * Fetch booked time slots from database.
+   * This uses selectedDentistId and selectedDate from Zustand.
+   * 
+   * Note: We need selectedDentistId and selectedDate to fetch booked slots.
+   * If they're not available, the query won't run (enabled: !!selectedDentistId && !!selectedDate).
+   */
+  const { data: bookedTimeSlots = [] } = useBookedTimeSlots(
+    selectedDentistId || "",
+    selectedDate || ""
+  );
 
   const availableDates = getNext5Days();
   const availableTimeSlots = getAvailableTimeSlots();
 
+  /**
+   * HANDLE DATE SELECT
+   * ------------------
+   * When user selects a date:
+   * 1. Update date in Zustand store
+   * 2. Reset time (because date changed)
+   * 3. Call parent callback (for step navigation if needed)
+   * 
+   * Note: We update Zustand state AND call parent callback.
+   * The parent callback is for step navigation, but state is in Zustand.
+   */
   const handleDateSelect = (date: string) => {
+    // Update Zustand store (global state)
+    setSelectedDate(date);
+    setSelectedTime(""); // Reset time when date changes
+    
+    // Also call parent callback (for step navigation if needed)
     onDateChange(date);
-    // reset time when the date changes
-    onTimeChange("");
+    onTimeChange(""); // Notify parent that time was reset
   };
 
   return (
@@ -61,7 +130,12 @@ function TimeSelectionStep({
                 className={`cursor-pointer transition-all hover:shadow-sm ${
                   selectedType === type.id ? "ring-2 ring-primary" : ""
                 }`}
-                onClick={() => onTypeChange(type.id)}
+                onClick={() => {
+                  // Update Zustand store (global state)
+                  setSelectedType(type.id);
+                  // Also call parent callback (for step navigation if needed)
+                  onTypeChange(type.id);
+                }}
               >
                 <CardContent className="p-4">
                   <div className="flex justify-between items-center">
@@ -114,7 +188,14 @@ function TimeSelectionStep({
                     <Button
                       key={time}
                       variant={selectedTime === time ? "default" : "outline"}
-                      onClick={() => !isBooked && onTimeChange(time)}
+                      onClick={() => {
+                        if (!isBooked) {
+                          // Update Zustand store (global state)
+                          setSelectedTime(time);
+                          // Also call parent callback (for step navigation if needed)
+                          onTimeChange(time);
+                        }
+                      }}
                       size="sm"
                       disabled={isBooked}
                       className={isBooked ? "opacity-50 cursor-not-allowed" : ""}

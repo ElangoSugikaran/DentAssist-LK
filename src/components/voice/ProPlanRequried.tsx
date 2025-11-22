@@ -4,7 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { CrownIcon, LockIcon, MicIcon } from "lucide-react";
 import Link from "next/link";
 
-function ProPlanRequried() {
+function ProPlanRequired() {
   return (
      <div className="min-h-screen bg-background">
       <Navbar />
@@ -79,4 +79,4 @@ function ProPlanRequried() {
   )
 }
 
-export default ProPlanRequried;
+export default  ProPlanRequired;

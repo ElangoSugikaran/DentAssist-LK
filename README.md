@@ -1,36 +1,179 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🦷 DentAssist-LK
 
-## Getting Started
+### **AI-Powered Dental Appointment Booking System (Built for Sri Lanka)**
 
-First, run the development server:
+DentAssist-LK is a full-stack web application for booking dental appointments online.
+
+This project is **inspired by a YouTube tutorial**, but completely **rebuilt by me from scratch** with my own architecture decisions, additional features, and improvements—including global state management, webhook integrations, database enhancements, appointment validation, and custom backend logic.
+
+This is a **personal learning and portfolio project**, and all integrations (Clerk subscription, Vapi voice, Resend emails) are used **only for testing purposes**, not real production billing.
+
+---
+
+## 📚 Documentation
+
+- **Architecture Diagram** → `ARCHITECTURE_DIAGRAM.excalidraw`
+- **[Deployment Guide](./DEPLOYMENT_GUIDE.md)** 🚀 - Complete guide to deploy to Vercel
+- **[Deployment Checklist](./DEPLOYMENT_CHECKLIST.md)** ✅ - Quick deployment checklist
+
+---
+
+## 🚀 Quick Start
+
+### **Prerequisites**
+- Node.js 20+
+- PostgreSQL database (Neon / Supabase / Railway)
+- Clerk account (for authentication)
+- Resend account (for emails)
+
+### **Installation**
 
 ```bash
+npm install
+
+npx prisma migrate dev
+npx prisma generate
+
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+````
+
+Project runs at:
+
+👉 **[http://localhost:3000](http://localhost:3000)**
+
+---
+
+## 🛠️ Tech Stack
+
+### **Frontend & App**
+
+* Next.js 15 (App Router)
+* React 19
+* Tailwind CSS 4
+* Shadcn/UI + Radix UI
+* TypeScript 5
+
+### **State Management**
+
+* Zustand (client state)
+* TanStack Query (server caching)
+
+### **Backend**
+
+* Next.js server actions
+* Prisma ORM
+* PostgreSQL
+
+### **Integrations**
+
+* Clerk (Authentication)
+* Resend (Email service)
+* Vapi.ai (AI Voice Assistant — testing only)
+
+---
+
+## ✨ Features Implemented by Me
+
+Although the UI concept was inspired by YouTube, all functionality and improvements were implemented **independently by me**.
+
+### ✔️ Core Features
+
+* Multi-step appointment booking flow
+* Real-time doctor availability
+* Appointment confirmations via email
+* Admin dashboard (doctors, appointments, stats)
+* Clerk-based authentication & roles (Admin / User)
+
+### ✔️ My Custom Improvements
+
+* Global state management using Zustand
+* Webhook handlers for Clerk & Resend
+* Custom Prisma schema + improved DB relations
+* Appointment conflict validation
+* Clean folder structure with reusable utilities
+* Sri Lankan branding and improved content
+* Fully responsive UI refinements
+
+---
+
+## 📁 Project Structure
+
+```
+src/
+├── app/               # Next.js App Router
+├── components/        # UI components
+├── hooks/             # Custom hooks
+├── lib/               # Utilities & server actions
+├── store/             # Zustand stores
+└── middleware.ts      # Auth middleware
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 🔐 Environment Variables
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Create a `.env` file based on `.env.example`.
 
-## Learn More
+Required:
 
-To learn more about Next.js, take a look at the following resources:
+* `DATABASE_URL`
+* `CLERK_SECRET_KEY`
+* `RESEND_API_KEY`
+* `VAPI_API_KEY` (optional)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+> **Note:** All payments/subscriptions are for **testing only** and not intended for real transactions.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+---
 
-## Deploy on Vercel
+## 🚀 Deployment
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### **Deploy to Vercel**
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+npm run build
+vercel deploy
+```
+
+Make sure to configure all environment variables inside Vercel.
+
+### **Recommended PostgreSQL Providers**
+
+* Supabase
+* Neon
+* Railway
+
+---
+
+## 🧪 Development Commands
+
+```bash
+npm run dev       # Start development server
+npm run build     # Build for production
+npm start         # Run production build
+
+# Prisma commands
+npx prisma migrate dev
+npx prisma generate
+npx prisma studio
+```
+
+---
+
+## 🤝 Contributing
+
+This is a personal portfolio project, but contributions are welcome.
+
+---
+
+## 📄 License
+
+Private project — All rights reserved.
+
+---
+
+## 👤 Author
+
+**DentAssist-LK Development**
+
+```
+

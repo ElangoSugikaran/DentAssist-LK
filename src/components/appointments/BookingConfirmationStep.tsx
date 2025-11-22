@@ -1,31 +1,63 @@
+/**
+ * BOOKING CONFIRMATION STEP - REFACTORED TO USE ZUSTAND
+ * ======================================================
+ * 
+ * WHAT CHANGED?
+ * -------------
+ * Before: We received all state (selectedDentistId, selectedDate, etc.) as props.
+ * After: We read state from Zustand store directly.
+ * 
+ * WHY?
+ * - No prop drilling (state is global)
+ * - Component is more independent
+ * - Cleaner code
+ * 
+ * ZUSTAND USAGE:
+ * -------------
+ * We use useAppointmentStore to:
+ * 1. Read state (selectedDentistId, selectedDate, selectedTime, selectedType)
+ * 
+ * NOTE:
+ * We still receive callbacks (onBack, onConfirm, onModify) as props because
+ * they handle booking submission and step navigation.
+ */
+
+"use client";
+
 import { APPOINTMENT_TYPES } from "@/lib/utils";
 import { Button } from "../ui/button";
 import { ChevronLeftIcon } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import DoctorInfo from "./DoctorInfo";
+import { useAppointmentStore } from "@/store/appointment-store"; // ✅ Import Zustand store
 
 
 interface BookingConfirmationStepProps {
-  selectedDentistId: string;
-  selectedDate: string;
-  selectedTime: string;
-  selectedType: string;
-  isBooking: boolean;
+  // We no longer need state as props - they come from Zustand
+  isBooking: boolean; // Still needed from parent (mutation status)
   onBack: () => void;
   onConfirm: () => void;
   onModify: () => void;
 }
 
 function BookingConfirmationStep({
-  selectedDentistId,
-  selectedDate,
-  selectedTime,
-  selectedType,
   isBooking,
   onBack,
   onConfirm,
   onModify,
 }: BookingConfirmationStepProps) {
+  /**
+   * ZUSTAND STORE - CLIENT STATE
+   * ----------------------------
+   * Read all selection state from Zustand store instead of props.
+   * This is global state, accessible from anywhere.
+   */
+  const selectedDentistId = useAppointmentStore((state) => state.selectedDentistId);
+  const selectedDate = useAppointmentStore((state) => state.selectedDate);
+  const selectedTime = useAppointmentStore((state) => state.selectedTime);
+  const selectedType = useAppointmentStore((state) => state.selectedType);
+  
+  // Find appointment type using selectedType from Zustand
   const appointmentType = APPOINTMENT_TYPES.find((t) => t.id === selectedType);
 
   return (
@@ -46,7 +78,7 @@ function BookingConfirmationStep({
 
         <CardContent className="space-y-4">
           {/* doctor info */}
-          <DoctorInfo doctorId={selectedDentistId} />
+          {selectedDentistId && <DoctorInfo doctorId={selectedDentistId} />}
 
           {/* appointment details */}
           <div className="grid grid-cols-2 gap-4 pt-4 border-t">
