@@ -116,7 +116,7 @@ export async function updateDoctor(input: UpdateDoctorInput) {
         revalidatePath("/admin");
 
         return doctor;
-    } catch (error) {
+    } catch (error: unknown) {
         console.log("Error updating doctor:", error);
         throw new Error("Failed to update doctor");
     }
@@ -143,7 +143,7 @@ export async function regenerateDoctorAvatars() {
         
         // Return success message with count of doctors updated
         return { success: true, count: doctors.length };
-    } catch (error) {
+    } catch (error : unknown) {
         console.log("Error regenerating avatars:", error);
         throw new Error("Failed to regenerate avatars");
     }
@@ -167,7 +167,7 @@ export async function getAvailableDoctors() {
             ...doctor,
             appointmentCount: doctor._count.appointments,  // Add appointment count for easy access
         }));
-    } catch (error) {
+    } catch (error : unknown) {
         console.error("Error fetching available doctors:", error);
         throw new Error("Failed to fetch available doctors");
     }

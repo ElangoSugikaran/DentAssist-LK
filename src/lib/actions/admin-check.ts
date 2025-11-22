@@ -29,7 +29,7 @@ export async function checkAdminAccess() {
     // Sync admin role to database
     try {
       await syncAdminRoleToDatabase(user.id);
-    } catch (error) {
+    } catch (error : unknown) {
       console.warn("⚠️ Failed to sync admin role to database:", error);
       // Don't block admin access if sync fails
     }
@@ -48,7 +48,7 @@ export async function checkAdminAccess() {
       console.log(`✅ Admin access granted (from DB): ${dbUser.email}`);
       return user;
     }
-  } catch (error) {
+  } catch (error : unknown) {
     console.warn("⚠️ Failed to check database for admin role:", error);
   }
 
@@ -65,7 +65,7 @@ export async function checkAdminAccess() {
         syncAdminRoleToDatabase(user.id),
         // Optional: could update Clerk metadata here if desired
       ]);
-    } catch (error) {
+    } catch (error : unknown) {
       console.warn("⚠️ Failed to sync admin role:", error);
     }
     
@@ -102,7 +102,7 @@ async function syncAdminRoleToDatabase(clerkId: string) {
     });
 
     console.log(`✅ Synced role '${role}' to database for user ${clerkId}`);
-  } catch (error) {
+  } catch (error : unknown) {
     console.error("Failed to sync admin role:", error);
   }
 }
@@ -123,7 +123,7 @@ export async function isAdminEmail(email: string): Promise<boolean> {
     // Fallback to env var
     const adminEmail = process.env.ADMIN_EMAIL;
     return adminEmail?.toLowerCase() === email.toLowerCase();
-  } catch (error) {
+  } catch (error : unknown) {
     console.error("Failed to check admin status:", error);
     return false;
   }
@@ -166,7 +166,7 @@ export async function setUserAsAdmin(clerkId: string): Promise<boolean> {
     // Go to Clerk Dashboard → User → Unsafe Metadata → Add { "role": "admin" }
     
     return true;
-  } catch (error) {
+  } catch (error : unknown) {
     console.error("Failed to set user as admin:", error);
     return false;
   }

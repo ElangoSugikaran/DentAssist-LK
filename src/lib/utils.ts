@@ -6,7 +6,11 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export function generateAvatar(name: string, _gender: "MALE" | "FEMALE") {
+export function generateAvatar(
+  name: string,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  _gender: "MALE" | "FEMALE"
+) {
   // Using ui-avatars.com - more reliable and faster
   // URL encodes the name and uses initials
   const initials = name
