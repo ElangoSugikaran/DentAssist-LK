@@ -13,9 +13,6 @@ This is a **personal learning and portfolio project**, and all integrations (Cle
 ## 📚 Documentation
 
 - **Architecture Diagram** → `ARCHITECTURE_DIAGRAM.excalidraw`
-- **[Deployment Guide](./DEPLOYMENT_GUIDE.md)** 🚀 - Complete guide to deploy to Vercel
-- **[Deployment Checklist](./DEPLOYMENT_CHECKLIST.md)** ✅ - Quick deployment checklist
-
 ---
 
 ## 🚀 Quick Start
