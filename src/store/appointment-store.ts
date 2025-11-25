@@ -136,7 +136,9 @@ export const useAppointmentStore = create<AppointmentBookingStore>()(
       },
     }),
     {
-      name: 'appointment-booking-storage', 
+      name: 'appointment-booking-storage',
+      // ✅ ADD THIS: Skip hydration on server
+      skipHydration: true,
     }
   )
 );
