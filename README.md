@@ -1,6 +1,6 @@
 # 🦷 DentAssist-LK
 
-### **AI-Powered Dental Appointment Booking System (Built for Sri Lanka)**
+### **AI-Powered Dental Appointment Booking System **
 
 DentAssist-LK is a full-stack web application for booking dental appointments online.
 
@@ -13,9 +13,6 @@ This is a **personal learning and portfolio project**, and all integrations (Cle
 ## 📚 Documentation
 
 - **Architecture Diagram** → `ARCHITECTURE_DIAGRAM.excalidraw`
-- **[Complete Deployment Guide](./VERCEL_DEPLOYMENT_GUIDE.md)** 📖 - Step-by-step Vercel deployment with explanations
-- **[Quick Deployment Checklist](./DEPLOYMENT_QUICK_START.md)** ⚡ - Fast reference for deployment
-
 ---
 
 ## 🚀 Quick Start
@@ -91,7 +88,6 @@ Although the UI concept was inspired by YouTube, all functionality and improveme
 * Custom Prisma schema + improved DB relations
 * Appointment conflict validation
 * Clean folder structure with reusable utilities
-* Sri Lankan branding and improved content
 * Fully responsive UI refinements
 
 ---
