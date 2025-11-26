@@ -39,102 +39,93 @@ function transformAppointment(appointment: AppointmentWithRelations) {
 
 
 export async function getAppointments() {
-    try {
-       const appointments = await prisma.appointment.findMany({
-            include:{
-                user: {
-                    select: {
-                        firstName: true,
-                        lastName: true,
-                        email: true,
-                    },
-                },
+  try {
+    const appointments = await prisma.appointment.findMany({
+      include: {
+        user: {
+          select: {
+            firstName: true,
+            lastName: true,
+            email: true,
+          },
+        },
 
-                doctor: { select: { name: true , imageUrl: true}}
-            },
-            orderBy: { createdAt: "desc" },
-        });
+        doctor: { select: { name: true, imageUrl: true } }
+      },
+      orderBy: { createdAt: "desc" },
+    });
 
-        return appointments.map(transformAppointment);
+    return appointments.map(transformAppointment);
 
-    } catch (error) {
-        console.log("Error fetching appointments:", error);
-        throw new Error("Failed to fetch appointments");
-    }
+  } catch (error) {
+    throw new Error("Failed to fetch appointments");
+  }
 }
 
 
 export async function getUserAppointmentStats() {
-    try {
-        const {userId} = await auth();
-        console.log("📊 getUserAppointmentStats: Fetching stats for clerkId:", userId);
-        
-        if (!userId) throw new Error("User not authenticated");
-        
-        const user = await prisma.user.findUnique({ where: { clerkId: userId } });
-        console.log("🔍 getUserAppointmentStats: Found user in DB:", user?.id);
+  try {
+    const { userId } = await auth();
 
-        if (!user) {
-            console.error("❌ getUserAppointmentStats: User not found in database for clerkId:", userId);
-            throw new Error("User not found in database. Please try refreshing the page.");
-        }
+    if (!userId) throw new Error("User not authenticated");
 
-        // these calls will run in parallel, instead of waiting each other
-        const [totalCount, completedCount] = await Promise.all([
-            prisma.appointment.count({
-                where: { userId: user.id },
-            }),
-            prisma.appointment.count({
-                where: {
-                userId: user.id,
-                status: "COMPLETED",
-                },
-            }),
-        ]);
+    const user = await prisma.user.findUnique({ where: { clerkId: userId } });
 
-        return {
-            totalAppointments: totalCount,
-            completedAppointments: completedCount,
-        };
-
-    } catch (error) {
-        console.error("Error fetching user appointment stats:", error);
-        return { totalAppointments: 0, completedAppointments: 0 };
+    if (!user) {
+      throw new Error("User not found in database. Please try refreshing the page.");
     }
+
+    // these calls will run in parallel, instead of waiting each other
+    const [totalCount, completedCount] = await Promise.all([
+      prisma.appointment.count({
+        where: { userId: user.id },
+      }),
+      prisma.appointment.count({
+        where: {
+          userId: user.id,
+          status: "COMPLETED",
+        },
+      }),
+    ]);
+
+    return {
+      totalAppointments: totalCount,
+      completedAppointments: completedCount,
+    };
+
+  } catch (error) {
+    return { totalAppointments: 0, completedAppointments: 0 };
+  }
 }
 
 export async function getUserAppointments() {
-    try {
-         // get authenticated user from Clerk
-        const { userId } = await auth();
-        console.log("📋 getUserAppointments: Fetching appointments for clerkId:", userId);
-        
-        if (!userId) throw new Error("You must be logged in to view appointments");
+  try {
+    // get authenticated user from Clerk
+    const { userId } = await auth();
 
-        // find user by clerkId from authenticated session
-        const user = await prisma.user.findUnique({ where: { clerkId: userId } });
-        console.log("🔍 getUserAppointments: Found user in DB:", user?.id);
-        
-        if (!user) {
-            console.error("❌ getUserAppointments: User not found in database for clerkId:", userId);
-            throw new Error("User not found in database. Your account may not be fully set up. Please refresh the page and try again.");
-        }
+    if (!userId) throw new Error("You must be logged in to view appointments");
 
-        const appointments = await prisma.appointment.findMany({
-            where: { userId: user.id },
-            include: {
-                user: { select: { firstName: true, lastName: true, email: true } },
-                doctor: { select: { name: true, imageUrl: true } },
-            },
-            orderBy: [{ date: "asc" }, { time: "asc" }],
-        });
+    // find user by clerkId from authenticated session
+    const user = await prisma.user.findUnique({ where: { clerkId: userId } });
 
-        return appointments.map(transformAppointment);
-
-    } catch (error) {
-        console.error("Error fetching user appointments:", error);
-        throw new Error("Failed to fetch user appointments");
+    if (!user) {
+      throw new Error("User not found in database. Your account may not be fully set up. Please refresh the page and try again.");
     }
+
+    const appointments = await prisma.appointment.findMany({
+      where: { userId: user.id },
+      include: {
+        user: { select: { firstName: true, lastName: true, email: true } },
+        doctor: { select: { name: true, imageUrl: true } },
+      },
+      orderBy: [{ date: "asc" }, { time: "asc" }],
+    });
+
+    return appointments.map(transformAppointment);
+
+  } catch (error) {
+    throw new Error("Failed to fetch user appointments");
+  }
 }
 
 export async function getBookedTimeSlots(doctorId: string, date: string) {
@@ -152,7 +143,6 @@ export async function getBookedTimeSlots(doctorId: string, date: string) {
 
     return appointments.map((appointment) => appointment.time);
   } catch (error) {
-    console.error("Error fetching booked time slots:", error);
     return []; // return empty array if there's an error
   }
 }
@@ -199,7 +189,6 @@ export async function bookAppointment(input: BookAppointmentInput) {
 
     return transformAppointment(appointment);
   } catch (error) {
-    console.error("Error booking appointment:", error);
     throw new Error("Failed to book appointment. Please try again later.");
   }
 }
@@ -212,7 +201,6 @@ export async function updateAppointmentStatus(input: { id: string; status: Appoi
 
     return appointment;
   } catch (error) {
-    console.error("Error updating appointment:", error);
     throw new Error("Failed to update appointment");
   }
 }

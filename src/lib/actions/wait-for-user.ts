@@ -24,21 +24,16 @@ export async function waitForUserInDatabase(
       });
 
       if (user) {
-        console.log(
-          `✅ [waitForUserInDatabase] User found after ${Date.now() - startTime}ms`
-        );
         return user;
       }
     } catch (error) {
-      console.error(`[waitForUserInDatabase] Database error:`, error);
+      // Continue retrying
     }
 
     // Wait before retrying
     await new Promise((resolve) => setTimeout(resolve, intervalMs));
   }
 
-  console.warn(
-    `⏱️ [waitForUserInDatabase] Timeout reached (${timeoutMs}ms) for user ${clerkId}`
-  );
+  return null;
   return null;
 }

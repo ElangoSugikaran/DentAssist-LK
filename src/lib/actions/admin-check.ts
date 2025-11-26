@@ -10,7 +10,6 @@ export async function checkAdminAccess() {
 
   // If not logged in, redirect to home
   if (!user) {
-    console.warn("❌ Admin access denied: User not authenticated");
     redirect("/");
   }
 
@@ -19,21 +18,19 @@ export async function checkAdminAccess() {
   interface ClerkMetadata {
     role?: string;
   }
-  const isAdminInClerk = 
-    (user.publicMetadata as ClerkMetadata | undefined)?.role === "admin" || 
+  const isAdminInClerk =
+    (user.publicMetadata as ClerkMetadata | undefined)?.role === "admin" ||
     user.unsafeMetadata?.role === "admin";
-  
+
   if (isAdminInClerk) {
-    console.log(`✅ Admin access granted for: ${user.emailAddresses?.[0]?.emailAddress}`);
-    
+
     // Sync admin role to database
     try {
       await syncAdminRoleToDatabase(user.id);
-    } catch (error : unknown) {
-      console.warn("⚠️ Failed to sync admin role to database:", error);
+    } catch (error: unknown) {
       // Don't block admin access if sync fails
     }
-    
+
     return user;
   }
 
@@ -45,11 +42,10 @@ export async function checkAdminAccess() {
     });
 
     if (dbUser?.role === "admin") {
-      console.log(`✅ Admin access granted (from DB): ${dbUser.email}`);
       return user;
     }
-  } catch (error : unknown) {
-    console.warn("⚠️ Failed to check database for admin role:", error);
+  } catch (error: unknown) {
+    // Silent fail
   }
 
   // Method 3: Fallback to ADMIN_EMAIL env var (backwards compatibility)
@@ -57,25 +53,21 @@ export async function checkAdminAccess() {
   const userEmail = user.emailAddresses?.[0]?.emailAddress || "";
 
   if (adminEmail && userEmail.toLowerCase() === adminEmail.toLowerCase()) {
-    console.log(`✅ Admin access granted (legacy ADMIN_EMAIL): ${userEmail}`);
-    
+
     // Sync to database and Clerk metadata for future lookups
     try {
       await Promise.all([
         syncAdminRoleToDatabase(user.id),
         // Optional: could update Clerk metadata here if desired
       ]);
-    } catch (error : unknown) {
-      console.warn("⚠️ Failed to sync admin role:", error);
+    } catch (error: unknown) {
+      // Silent fail
     }
-    
+
     return user;
   }
 
   // Not an admin
-  console.warn(
-    `❌ Admin access denied: ${userEmail} is not authorized.`
-  );
   redirect("/dashboard");
 }
 
@@ -91,8 +83,8 @@ async function syncAdminRoleToDatabase(clerkId: string) {
     interface ClerkMetadata {
       role?: string;
     }
-    const isAdmin = 
-      (user.publicMetadata as ClerkMetadata | undefined)?.role === "admin" || 
+    const isAdmin =
+      (user.publicMetadata as ClerkMetadata | undefined)?.role === "admin" ||
       user.unsafeMetadata?.role === "admin";
     const role = isAdmin ? "admin" : "user";
 
@@ -101,9 +93,8 @@ async function syncAdminRoleToDatabase(clerkId: string) {
       data: { role },
     });
 
-    console.log(`✅ Synced role '${role}' to database for user ${clerkId}`);
-  } catch (error : unknown) {
-    console.error("Failed to sync admin role:", error);
+  } catch (error: unknown) {
+    // Silent fail
   }
 }
 
@@ -123,8 +114,7 @@ export async function isAdminEmail(email: string): Promise<boolean> {
     // Fallback to env var
     const adminEmail = process.env.ADMIN_EMAIL;
     return adminEmail?.toLowerCase() === email.toLowerCase();
-  } catch (error : unknown) {
-    console.error("Failed to check admin status:", error);
+  } catch (error: unknown) {
     return false;
   }
 }
@@ -146,8 +136,8 @@ export async function setUserAsAdmin(clerkId: string): Promise<boolean> {
     interface ClerkMetadata {
       role?: string;
     }
-    const callerIsAdmin = 
-      (caller.publicMetadata as ClerkMetadata | undefined)?.role === "admin" || 
+    const callerIsAdmin =
+      (caller.publicMetadata as ClerkMetadata | undefined)?.role === "admin" ||
       caller.unsafeMetadata?.role === "admin";
     if (!callerIsAdmin) {
       throw new Error("Only admins can grant admin access");
@@ -160,14 +150,11 @@ export async function setUserAsAdmin(clerkId: string): Promise<boolean> {
       select: { email: true },
     });
 
-    console.log(`✅ User ${updatedUser.email} granted admin access`);
-
     // Note: To complete, also update Clerk metadata:
     // Go to Clerk Dashboard → User → Unsafe Metadata → Add { "role": "admin" }
-    
+
     return true;
-  } catch (error : unknown) {
-    console.error("Failed to set user as admin:", error);
+  } catch (error: unknown) {
     return false;
   }
 }

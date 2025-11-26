@@ -11,14 +11,10 @@ function UserSync() {
         const handleUserSync = async () => {
             if (isLoaded && isSignedIn && user) {
                 try {
-                    console.log("🔄 UserSync: Syncing user with clerkId:", user.id);
-                    const result = await syncUser();
-                    console.log("✅ UserSync: User synced successfully:", result);
+                    await syncUser();
                 } catch (error) {
-                    console.error("❌ UserSync: Failed to sync user:", error);
+                    // Silent fail or handle via global error boundary
                 }
-            } else {
-                console.log("⏳ UserSync: Waiting for user to load... isLoaded:", isLoaded, "isSignedIn:", isSignedIn);
             }
         };
         handleUserSync();

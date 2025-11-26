@@ -39,7 +39,6 @@ export async function POST(req: Request) {
       "svix-signature": svix_signature,
     }) as WebhookEvent;
   } catch (err) {
-    console.error("Error: Could not verify webhook:", err);
     return new Response("Error: Unauthorized", {
       status: 401,
     });
@@ -67,8 +66,6 @@ export async function POST(req: Request) {
           role, // Store role from Clerk metadata
         },
       });
-
-      console.log(`✅ User created in database: ${id} (role: ${role})`);
     }
 
     if (eventType === "user.updated") {
@@ -89,8 +86,6 @@ export async function POST(req: Request) {
           role, // Update role from Clerk metadata
         },
       });
-
-      console.log(`✅ User updated in database: ${id} (role: ${role})`);
     }
 
     if (eventType === "user.deleted") {
@@ -100,11 +95,8 @@ export async function POST(req: Request) {
       await prisma.user.delete({
         where: { clerkId: id },
       });
-
-      console.log(`✅ User deleted from database: ${id}`);
     }
   } catch (error) {
-    console.error("Webhook processing error:", error);
     return new Response("Error: Webhook processing failed", {
       status: 500,
     });
