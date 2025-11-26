@@ -15,67 +15,61 @@ export function useGetDoctors() {
 
 export function useCreateDoctor() {
     const queryClient = useQueryClient();
-    
+
     const result = useMutation({
         mutationFn: createDoctor,
         onSuccess: () => {
-            console.log("Doctor created successfully");
             queryClient.invalidateQueries({ queryKey: ["getDoctors"] });
             queryClient.invalidateQueries({ queryKey: ["getAvailableDoctors"] });
         },
         onError: (error: unknown) => {
-            const message = error instanceof Error ? error.message : "Unknown error";
-            console.log("Error creating doctor:", message);
+            // Error handling is managed by the UI or global handler
         },
     });
-    
+
     return result;
 }
 
 export function useRegenerateDoctorAvatars() {
     const queryClient = useQueryClient();
-    
+
     const result = useMutation({
         mutationFn: regenerateDoctorAvatars,
         onSuccess: () => {
-            console.log("Doctor avatars regenerated successfully");
             queryClient.invalidateQueries({ queryKey: ["getDoctors"] });
         },
         onError: (error: unknown) => {
-            const message = error instanceof Error ? error.message : "Unknown error";
-            console.log("Error regenerating avatars:", message);
+            // Error handling is managed by the UI or global handler
         },
     });
-    
+
     return result;
 }
 
 export function useUpdateDoctor() {
     const queryClient = useQueryClient();
-    
+
     const result = useMutation({
         mutationFn: updateDoctor,
         onSuccess: () => {
-            console.log("Doctor updated successfully");
             queryClient.invalidateQueries({ queryKey: ["getDoctors"] });
         },
-        onError: (error:unknown) => {
-            const message = error instanceof Error ? error.message : "Unknown error";
-            console.log("Error updating doctor:", message);
+        onError: (error: unknown) => {
+            // Error handling is managed by the UI or global handler
         },
     });
-    
+
     return result;
 }
 
 // get available doctors for appointments
 export function useAvailableDoctors() {
-  const result = useQuery({
-    queryKey: ["getAvailableDoctors"],
-    queryFn: getAvailableDoctors,
-  });
+    const result = useQuery({
+        queryKey: ["getAvailableDoctors"],
+        queryFn: getAvailableDoctors,
+    });
 
-  return result;
+    return result;
 }
 
 

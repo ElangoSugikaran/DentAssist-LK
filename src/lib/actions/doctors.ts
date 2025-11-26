@@ -11,10 +11,12 @@ export async function getDoctors() {
         // Query database for all doctors
         const doctors = await prisma.doctor.findMany({
             include: {
-                _count: {select: { appointments: true }  // Count total appointments per doctor
-            }},
+                _count: {
+                    select: { appointments: true }  // Count total appointments per doctor
+                }
+            },
             orderBy: { createdAt: "desc" }              // Show newest doctors first
-        }) 
+        })
 
         // Map to add appointmentCount to each doctor object
         return doctors.map(doctor => ({
@@ -23,7 +25,6 @@ export async function getDoctors() {
         }));
 
     } catch (error) {
-        console.log("Error fetching doctors:", error);
         throw new Error("Failed to fetch doctors");
     }
 };
@@ -39,13 +40,13 @@ interface CreateDoctorInput {
 }
 
 // Create a new doctor in the database
-export  async function createDoctor(input:CreateDoctorInput) {
+export async function createDoctor(input: CreateDoctorInput) {
     try {
         // Validate required fields
         if (!input.name || !input.email) throw new Error("Name and Email are required");
 
         // Create doctor record with auto-generated avatar image
-        const doctor = await prisma.doctor.create ({
+        const doctor = await prisma.doctor.create({
             data: {
                 ...input,                                  // Spread all input fields (name, email, phone, specialty, gender, isActive)
                 imageUrl: generateAvatar(input.name, input.gender) // Generate avatar based on name and gender
@@ -58,7 +59,6 @@ export  async function createDoctor(input:CreateDoctorInput) {
         return doctor;
 
     } catch (error: unknown) {
-        console.log("Error creating doctor:", error);
 
         // Handle duplicate email error
         if (error && typeof error === "object" && "code" in error && error.code === "P2002") {
@@ -100,7 +100,7 @@ export async function updateDoctor(input: UpdateDoctorInput) {
         }
 
         // Update doctor record with new information
-        const doctor = await prisma.doctor.update({ 
+        const doctor = await prisma.doctor.update({
             where: { id: input.id },                        // Find doctor by ID
             data: {
                 name: input.name,                           // Update doctor name
@@ -117,7 +117,6 @@ export async function updateDoctor(input: UpdateDoctorInput) {
 
         return doctor;
     } catch (error: unknown) {
-        console.log("Error updating doctor:", error);
         throw new Error("Failed to update doctor");
     }
 }
@@ -126,11 +125,11 @@ export async function regenerateDoctorAvatars() {
     try {
         // Fetch all doctors from the database
         const doctors = await prisma.doctor.findMany();
-        
+
         // Loop through each doctor and regenerate their avatar image
         for (const doctor of doctors) {
             const newImageUrl = generateAvatar(doctor.name, doctor.gender); // Create new avatar URL based on name and gender
-            
+
             // Update each doctor with the new avatar URL
             await prisma.doctor.update({
                 where: { id: doctor.id },  // Find doctor by ID
@@ -140,11 +139,10 @@ export async function regenerateDoctorAvatars() {
 
         // Revalidate admin page to show updated avatars
         revalidatePath("/admin");
-        
+
         // Return success message with count of doctors updated
         return { success: true, count: doctors.length };
-    } catch (error : unknown) {
-        console.log("Error regenerating avatars:", error);
+    } catch (error: unknown) {
         throw new Error("Failed to regenerate avatars");
     }
 }
@@ -167,8 +165,7 @@ export async function getAvailableDoctors() {
             ...doctor,
             appointmentCount: doctor._count.appointments,  // Add appointment count for easy access
         }));
-    } catch (error : unknown) {
-        console.error("Error fetching available doctors:", error);
+    } catch (error: unknown) {
         throw new Error("Failed to fetch available doctors");
     }
 }
