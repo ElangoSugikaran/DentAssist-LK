@@ -17,7 +17,6 @@ import { formatPhoneNumber } from "@/lib/utils";
 import { toast } from "sonner";
 
 
-
 interface AddDoctorDialogProps {
   isOpen: boolean;
   onClose: () => void;
@@ -43,7 +42,6 @@ function AddDoctorDialog({ isOpen, onClose }: AddDoctorDialogProps) {
   const handleSave = () => {
 
     if (!newDoctor.name || !newDoctor.email || !newDoctor.specialty) {
-      toast.error("Please fill in all required fields");
       return;
     }
 
@@ -53,7 +51,8 @@ function AddDoctorDialog({ isOpen, onClose }: AddDoctorDialogProps) {
         handleClose();
       },
       onError: (error) => {
-        toast.error(`Failed to add doctor: ${error.message}`);
+        const message = error instanceof Error ? error.message : 'An unexpected error occurred';
+        toast.error(`Failed to add doctor: ${message}`);
       }
     });
 
