@@ -19,9 +19,15 @@ export default async function Home() {
     <div className="min-h-screen bg-background">
       <Header />
       <Hero />
-      <HowItWorks />
-      <WhatToAsk />
-      <PricingSection />
+      <section id="how-it-works">
+        <HowItWorks />
+      </section>
+      <section id="about">
+        <WhatToAsk />
+      </section>
+      <section id="pricing">
+        <PricingSection />
+      </section>
       <CTA />
       <Footer />
     </div>
