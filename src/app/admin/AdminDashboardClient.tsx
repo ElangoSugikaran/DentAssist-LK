@@ -19,7 +19,7 @@ function AdminDashboardClient() {
   interface ClerkMetadata {
     role?: string;
   }
-  const isAdminVerified = 
+  const isAdminVerified =
     (user?.publicMetadata as ClerkMetadata | undefined)?.role === "admin";
 
   // calculate stats from real data

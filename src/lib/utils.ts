@@ -8,19 +8,15 @@ export function cn(...inputs: ClassValue[]) {
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function generateAvatar(
   name: string,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  _gender: "MALE" | "FEMALE"
+  gender: "MALE" | "FEMALE"
 ) {
-  // Using ui-avatars.com - more reliable and faster
-  // URL encodes the name and uses initials
-  const initials = name
-    .split(" ")
-    .map((n) => n.charAt(0))
-    .join("")
-    .toUpperCase()
-    .slice(0, 2);
-  
-  return `https://ui-avatars.com/api/?name=${encodeURIComponent(initials)}&background=random&color=fff&size=128`;
+  // Use avatar.iran.liara.run for gender-specific avatars
+  const username = encodeURIComponent(name);
+  if (gender === "MALE") {
+    return `https://avatar.iran.liara.run/public/boy?username=${username}`;
+  } else {
+    return `https://avatar.iran.liara.run/public/girl?username=${username}`;
+  }
 }
 
 // Sri Lanka phone formatting: 0XX XXX XXXX
