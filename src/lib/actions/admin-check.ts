@@ -19,8 +19,7 @@ export async function checkAdminAccess() {
     role?: string;
   }
   const isAdminInClerk =
-    (user.publicMetadata as ClerkMetadata | undefined)?.role === "admin" ||
-    user.unsafeMetadata?.role === "admin";
+    (user.publicMetadata as ClerkMetadata | undefined)?.role === "admin";
 
   if (isAdminInClerk) {
 
@@ -84,8 +83,7 @@ async function syncAdminRoleToDatabase(clerkId: string) {
       role?: string;
     }
     const isAdmin =
-      (user.publicMetadata as ClerkMetadata | undefined)?.role === "admin" ||
-      user.unsafeMetadata?.role === "admin";
+      (user.publicMetadata as ClerkMetadata | undefined)?.role === "admin";
     const role = isAdmin ? "admin" : "user";
 
     await prisma.user.update({
@@ -137,8 +135,7 @@ export async function setUserAsAdmin(clerkId: string): Promise<boolean> {
       role?: string;
     }
     const callerIsAdmin =
-      (caller.publicMetadata as ClerkMetadata | undefined)?.role === "admin" ||
-      caller.unsafeMetadata?.role === "admin";
+      (caller.publicMetadata as ClerkMetadata | undefined)?.role === "admin";
     if (!callerIsAdmin) {
       throw new Error("Only admins can grant admin access");
     }

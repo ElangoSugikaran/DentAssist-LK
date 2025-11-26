@@ -14,9 +14,8 @@ function Navbar() {
   interface ClerkMetadata {
     role?: string;
   }
-  const isAdmin = 
-    (user?.publicMetadata as ClerkMetadata | undefined)?.role === "admin" || 
-    user?.unsafeMetadata?.role === "admin";
+  const isAdmin =
+    (user?.publicMetadata as ClerkMetadata | undefined)?.role === "admin";
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 px-6 py-2 border-b border-border/50 bg-background/80 backdrop-blur-md h-16">
@@ -30,11 +29,10 @@ function Navbar() {
           <div className="flex items-center gap-6">
             <Link
               href="/dashboard"
-              className={`flex items-center gap-2 transition-colors ${
-                pathname === "/dashboard"
+              className={`flex items-center gap-2 transition-colors ${pathname === "/dashboard"
                   ? "text-foreground hover:text-primary font-medium"
                   : "text-muted-foreground hover:text-foreground"
-              }`}
+                }`}
             >
               <HomeIcon className="w-4 h-4" />
               <span className="hidden md:inline">Dashboard</span>
@@ -42,9 +40,8 @@ function Navbar() {
 
             <Link
               href="/appointments"
-              className={`flex items-center gap-2 transition-colors hover:text-foreground ${
-                pathname === "/appointments" ? "text-foreground" : "text-muted-foreground"
-              }`}
+              className={`flex items-center gap-2 transition-colors hover:text-foreground ${pathname === "/appointments" ? "text-foreground" : "text-muted-foreground"
+                }`}
             >
               <CalendarIcon className="w-4 h-4" />
               <span className="hidden md:inline">Appointments</span>
@@ -52,9 +49,8 @@ function Navbar() {
 
             <Link
               href="/voice"
-              className={`flex items-center gap-2 transition-colors hover:text-foreground ${
-                pathname === "/voice" ? "text-foreground" : "text-muted-foreground"
-              }`}
+              className={`flex items-center gap-2 transition-colors hover:text-foreground ${pathname === "/voice" ? "text-foreground" : "text-muted-foreground"
+                }`}
             >
               <MicIcon className="w-4 h-4" />
               <span className="hidden md:inline">Voice</span>
@@ -62,9 +58,8 @@ function Navbar() {
 
             <Link
               href="/pro"
-              className={`flex items-center gap-2 transition-colors hover:text-foreground ${
-                pathname === "/pro" ? "text-foreground" : "text-muted-foreground"
-              }`}
+              className={`flex items-center gap-2 transition-colors hover:text-foreground ${pathname === "/pro" ? "text-foreground" : "text-muted-foreground"
+                }`}
             >
               <CrownIcon className="w-4 h-4" />
               <span className="hidden md:inline">Pro</span>
@@ -74,11 +69,10 @@ function Navbar() {
             {isAdmin && (
               <Link
                 href="/admin"
-                className={`flex items-center gap-2 transition-colors relative ${
-                  pathname === "/admin"
+                className={`flex items-center gap-2 transition-colors relative ${pathname === "/admin"
                     ? "text-primary font-medium"
                     : "text-muted-foreground hover:text-primary"
-                }`}
+                  }`}
               >
                 <ShieldIcon className="w-4 h-4" />
                 <span className="hidden md:inline">Admin</span>
