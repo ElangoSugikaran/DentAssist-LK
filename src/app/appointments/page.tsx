@@ -206,7 +206,10 @@ function AppointmentsPage() {
           // Note: Don't reset booking here - let the modal handle it when closed
           // This ensures the modal has the appointment data to display
         },
-        onError: (error) => toast.error(`Failed to book appointment: ${error.message}`),
+        onError: (error) => {
+          const message = error instanceof Error ? error.message : 'An unexpected error occurred';
+          toast.error(`Failed to book appointment: ${message}`);
+        },
       }
     );
   };
