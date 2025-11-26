@@ -1,14 +1,14 @@
 import {
-    Body,
-    Container,
-    Head,
-    Heading,
-    Html,
-    Img,
-    Link,
-    Preview,
-    Section,
-    Text,
+  Body,
+  Container,
+  Head,
+  Heading,
+  Html,
+  Img,
+  Link,
+  Preview,
+  Section,
+  Text,
 } from "@react-email/components";
 
 interface AppointmentConfirmationEmailProps {
@@ -18,6 +18,7 @@ interface AppointmentConfirmationEmailProps {
   appointmentType: string;
   duration: string;
   price: string;
+  appUrl: string;
 }
 
 function AppointmentConfirmationEmail({
@@ -27,18 +28,19 @@ function AppointmentConfirmationEmail({
   appointmentType,
   duration,
   price,
+  appUrl,
 }: AppointmentConfirmationEmailProps) {
 
 
   return (
-       <Html>
+    <Html>
       <Head />
       <Preview>Your dental appointment has been confirmed</Preview>
       <Body style={main}>
         <Container style={container}>
           <Section style={logoContainer}>
             <Img
-              src={`${process.env.NEXT_PUBLIC_APP_URL}/logo.png`}
+              src={`${appUrl}/logo.png`}
               width="50"
               height="50"
               alt="DentWise"
@@ -83,7 +85,7 @@ function AppointmentConfirmationEmail({
           </Text>
 
           <Section style={buttonContainer}>
-            <Link style={button} href={process.env.NEXT_PUBLIC_APP_URL + "/appointments"}>
+            <Link style={button} href={`${appUrl}/appointments`}>
               View My Appointments
             </Link>
           </Section>

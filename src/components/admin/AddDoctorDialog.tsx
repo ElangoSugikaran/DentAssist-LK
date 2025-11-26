@@ -14,6 +14,7 @@ import { Input } from "../ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { Button } from "../ui/button";
 import { formatPhoneNumber } from "@/lib/utils";
+import { toast } from "sonner";
 
 
 
@@ -22,46 +23,53 @@ interface AddDoctorDialogProps {
   onClose: () => void;
 }
 
-function AddDoctorDialog({isOpen, onClose}: AddDoctorDialogProps) {
-    const [newDoctor, setNewDoctor] = useState({
-        name: "",
-        email: "",
-        phone: "",
-        specialty: "",
-        gender: "MALE" as Gender,
-        isActive: true,
+function AddDoctorDialog({ isOpen, onClose }: AddDoctorDialogProps) {
+  const [newDoctor, setNewDoctor] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    specialty: "",
+    gender: "MALE" as Gender,
+    isActive: true,
+  });
+
+  const createMutationDoctor = useCreateDoctor();
+
+  const handlePhoneChange = (value: string) => {
+    const formattedPhoneNumber = formatPhoneNumber(value)
+    setNewDoctor({ ...newDoctor, phone: formattedPhoneNumber });
+  };
+
+  const handleSave = () => {
+
+    if (!newDoctor.name || !newDoctor.email || !newDoctor.specialty) {
+      toast.error("Please fill in all required fields");
+      return;
+    }
+
+    createMutationDoctor.mutate({ ...newDoctor }, {
+      onSuccess: () => {
+        toast.success("Doctor added successfully!");
+        handleClose();
+      },
+      onError: (error) => {
+        toast.error(`Failed to add doctor: ${error.message}`);
+      }
     });
 
-    const createMutationDoctor = useCreateDoctor();
+  };
 
-    const handlePhoneChange = (value: string) => {
-        const formattedPhoneNumber = formatPhoneNumber(value)
-        setNewDoctor({ ...newDoctor, phone: formattedPhoneNumber });
-    };
-
-    const handleSave = () => {
-        
-        if (!newDoctor.name || !newDoctor.email || !newDoctor.specialty) {
-            return;
-        }
-        
-        createMutationDoctor.mutate({ ...newDoctor }, { 
-            onSuccess: handleClose 
-        });
-      
-    };
-
-    const handleClose = () => {
-        onClose();
-        setNewDoctor({
-        name: "",
-        email: "",
-        phone: "",
-        specialty: "",
-        gender: "MALE",
-        isActive: true,
-        });
-    };
+  const handleClose = () => {
+    onClose();
+    setNewDoctor({
+      name: "",
+      email: "",
+      phone: "",
+      specialty: "",
+      gender: "MALE",
+      isActive: true,
+    });
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>

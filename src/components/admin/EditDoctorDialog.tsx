@@ -14,39 +14,47 @@ import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { Button } from "../ui/button";
+import { toast } from "sonner";
 
 
 interface EditDoctorDialogProps {
-    isOpen: boolean;
-    onclose: () => void;
-    doctor: Doctor | null;
+  isOpen: boolean;
+  onclose: () => void;
+  doctor: Doctor | null;
 }
 
-function EditDoctorDialog({isOpen, onclose, doctor}: EditDoctorDialogProps) {
-    const [ editingDoctor, setEditingDoctor] = useState<Doctor | null>(doctor);
+function EditDoctorDialog({ isOpen, onclose, doctor }: EditDoctorDialogProps) {
+  const [editingDoctor, setEditingDoctor] = useState<Doctor | null>(doctor);
 
-    const updateDoctorMutation = useUpdateDoctor();
+  const updateDoctorMutation = useUpdateDoctor();
 
 
-    const handlePhoneChange = (value: string) => {
-        const formattedPhoneNumber = formatPhoneNumber(value)
-        if (editingDoctor) {
-            setEditingDoctor({ ...editingDoctor, phone: formattedPhoneNumber });
+  const handlePhoneChange = (value: string) => {
+    const formattedPhoneNumber = formatPhoneNumber(value)
+    if (editingDoctor) {
+      setEditingDoctor({ ...editingDoctor, phone: formattedPhoneNumber });
+    }
+  };
+
+  const handleSave = () => {
+    if (editingDoctor) {
+      updateDoctorMutation.mutate({ ...editingDoctor }, {
+        onSuccess: () => {
+          toast.success("Doctor updated successfully!");
+          handleClose();
+        },
+        onError: (error) => {
+          const message = error instanceof Error ? error.message : 'An unexpected error occurred';
+          toast.error(`Failed to update doctor: ${message}`);
         }
-    };
-    
-    const handleSave = () => {
-        if (editingDoctor) {
-            updateDoctorMutation.mutate({ ...editingDoctor }, { 
-                onSuccess: handleClose 
-            });
-        }
-    };
+      });
+    }
+  };
 
-    const handleClose = () => {
-        onclose();
-        setEditingDoctor(null);
-    };
+  const handleClose = () => {
+    onclose();
+    setEditingDoctor(null);
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
