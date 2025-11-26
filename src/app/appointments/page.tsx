@@ -203,9 +203,8 @@ function AppointmentsPage() {
           // Show the success modal (update Zustand state)
           setShowConfirmationModal(true);
 
-          // Reset booking state using Zustand action
-          // This clears all selections and returns to step 1
-          resetBooking();
+          // Note: Don't reset booking here - let the modal handle it when closed
+          // This ensures the modal has the appointment data to display
         },
         onError: (error) => toast.error(`Failed to book appointment: ${error.message}`),
       }
@@ -269,7 +268,13 @@ function AppointmentsPage() {
       {bookedAppointment && (
         <AppointmentConfirmationModal
           open={showConfirmationModal}
-          onOpenChange={setShowConfirmationModal}
+          onOpenChange={(open) => {
+            setShowConfirmationModal(open);
+            if (!open) {
+              // Reset booking when modal is closed
+              resetBooking();
+            }
+          }}
           appointmentDetails={{
             doctorName: bookedAppointment.doctorName,
             appointmentDate: format(new Date(bookedAppointment.date), "EEEE, MMMM d, yyyy"),
